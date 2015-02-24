@@ -1,0 +1,119 @@
+<style type="text/css">
+#title {
+  text-align: center;
+  padding-bottom: 60px;
+  font-size: 22px;
+  font-weight: 400;
+}
+
+
+
+body {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  background-color: #fff;
+  width: 960px;
+  height: 800px;
+  margin-top: 10px;
+}
+
+#charts{
+  float: left;
+}
+
+.chart {
+  height: 100px;
+  margin-bottom: 20px;
+}
+
+.reset {
+  padding-left: 1em;
+  font-size: smaller;
+  color: blue;
+}
+
+.background.bar {
+  fill: #ccc;
+}
+
+.foreground.bar {
+  fill: steelblue;
+}
+
+.axis path, .axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.axis text {
+  font: 10px sans-serif;
+}
+
+.brush rect.extent {
+  fill: steelblue;
+  fill-opacity: .125;
+}
+
+.brush .resize path {
+  fill: #eee;
+  stroke: #666;
+}
+
+#chart path {
+  stroke: #fff;
+}
+
+#chart path.highlighted {
+  cursor: pointer;
+}
+
+.counties {
+  fill: none;
+  stroke: #C0C0C0;
+  stroke-linejoin: round;
+}
+
+.q0-11{fill:rgb(165,0,38)}
+.q1-11{fill:rgb(215,48,39)}
+.q2-11{fill:rgb(244,109,67)}
+.q3-11{fill:rgb(253,174,97)}
+.q4-11{fill:rgb(254,224,144)}
+.q5-11{fill:rgb(255,255,191)}
+.q6-11{fill:rgb(224,243,248)}
+.q7-11{fill:rgb(171,217,233)}
+.q8-11{fill:rgb(116,173,209)}
+.q9-11{fill:rgb(69,117,180)}
+.q10-11{fill:rgb(49,54,149)}
+
+#map {
+  float: right;
+}
+
+#map-legend{
+  text-align: center; 
+}
+
+
+
+
+</style>
+<county-map></county-map>
+<div id="title">Population and Per Capita Income Change in the United States, 2011-2012</div>
+<div id="charts">
+  <div id="pop-chart" class="chart">
+    <div class="title">Population Change</div>
+  </div>
+  <div id="per_cap-chart" class="chart">
+    <div class="title">Per Capita Income Change</div>
+  </div>
+</div>
+<div id="map">
+  <div id="map-legend">
+    <br>
+    <div class="title">Per Capita Income Change, 2011-2012
+      <div class="title">-35% . . . . . . . . . . . . . . . . . +50%</div>
+    </div>
+  </div>
+</div>

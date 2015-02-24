@@ -1,0 +1,68 @@
+ <style type="text/css">
+
+svg text {
+  fill: #fff;
+}
+
+#map {
+    display: block;
+    position:absolute;
+    height:auto;
+    bottom:0;
+    top:0;
+    left:0;
+    right:0;
+    margin-top:50px; /* adjust top margin to your header height */
+}
+.ctn-filter{
+  position: absolute;
+  bottom: 0;
+    margin-left: 0px;
+}
+#DeathMonth,
+#AcciMonth {
+  width: 330px;
+}
+.ctn-nav {
+  box-shadow: "rgb(0, 0, 0) 0px 0px 17px 2px";
+  position: fixed;
+  right: 80px;
+  top: 30px;
+  z-index: 3;
+  opacity: 0.9;
+  height: 230px;
+  width: 300px;
+  cursor: pointer;
+  font-family: 'Noto Sans', sans-serif;
+}
+.navttl,
+.navidx {
+  text-align: center;
+}
+
+
+    </style>
+
+
+
+ <google-vis></google-vis>
+  <input id="pac-input" class="controls" type="text" placeholder="Search Box">
+ <div id="map"></div>
+ <div class="ctn-filter-all">
+  <div class="ctn-filter">
+    <div id="DeathMonth" class="filter fltMonth col-lg-3">Death/Month</div>
+    <div id="DeathWeekDay" class="filter fltWeek col-lg-3">Death/Weekday</div>
+    <div id="DeathHour" class="filter fltHour col-lg-3">Death/Hour</div>
+  </div>
+
+    <div class="ctn-filter">
+      <div id="AcciMonth" class="filter fltMonth col-lg-3">Accidents/Month</div>
+      <div id="AcciWeekDay" class="filter fltWeek col-lg-3">Accidents/Weekday</div>
+      <div id="AcciHour" class="filter fltHour col-lg-3">Accidents/Hour</div>
+    </div>
+  </div>
+    <div class="ctn-nav">
+    <h3 class="navttl">Accidents Crossfilter</h3>
+    <h5 class="navidx"></h5>
+    <p class="navtxt"></p>
+    </div>
