@@ -27,9 +27,9 @@ angular
       .when('/National_Density_Analysis', {
         templateUrl: 'views/National_Density_Analysis.html',
         controller: 'MainCtrl'
-      }).when('/Local_Comparisons', {
-        templateUrl: 'views/Local_Comparisons.html',
-        controller: 'ChoroplethCtrl'
+      }).when('/bayes_clusters', {
+        templateUrl: 'views/bayes_clusters.html',
+        controller: 'ClusterCtrl'
       }).when('/Time_Series', {
         templateUrl: 'views/Time_Series.html',
         controller: 'TimemapCtrl'

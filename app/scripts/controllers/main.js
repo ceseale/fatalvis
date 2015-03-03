@@ -13,13 +13,69 @@
 var app = angular.module('ibmappApp');
   app.controller('MainCtrl', function ($scope) {
 
+$scope.loadcount = 0 ; 
+
+
   });
+
+
+
+    app.directive('loadingDonut', function(){
+      function link(scope, el, attr){
+        var color = d3.scale.category10();
+        var data = [0, 6]
+        var width = $(window).height() - 200
+        var height = $(window).height() - 200
+        var min = Math.min(width, height);
+        var svg = d3.select(el[0]).append('svg').attr('id', 'loading');
+        var pie = d3.layout.pie().sort(null);
+        var arc = d3.svg.arc()
+          .outerRadius(min / 2 * 0.9)
+          .innerRadius(min / 2 * 0.5);
+       
+        svg.attr({width: width, height: height});
+        var g = svg.append('g')
+
+
+          // center the donut chart
+          .attr('transform', 'translate(' + width / 2 + ',' + height / 2 + ')');
+
+        // add the <path>s for each arc slice
+        var arcs = g.selectAll('path').data(pie(data))
+          .enter().append('path')
+            // .style('stroke', 'white')
+            .attr('fill', function(d, i){ return color(i) })
+            .attr('id', 'loading')
+    
+    
+
+
+        scope.$watch('loadcount', function(loadcount){
+
+          data = [loadcount, 6 - loadcount]
+      ;
+          arcs.data(pie(data)).attr('d', arc);
+          if(loadcount == 6 ){
+
+            // svg.remove();
+          }
+        }, true);
+
+    
+      }
+      return {
+        link: link,
+        restrict: 'E'
+      };
+    });
+
+
 
 
   app.directive('googleVis', function(){
   	function link(scope, el ){
 
-var colorDead, colorAcci, lngDim, latDim, projection, overlay, padding, mapOffset, weekDayTable, gPrints, monthDim, weekdayDim, hourDim, map, barAcciHour, styledMap, initMap, transform, ifdead, setCircle, initCircle, tranCircle, updateGraph;
+var colorDead, colorAcci, lngDim, latDim, projection, overlay, padding, mapOffset, weekDayTable, gPrints, doaDim, weekdayDim, hourDim, map, barAcciHour, styledMap, initMap, transform, ifdead, setCircle, initCircle, tranCircle, updateGraph;
 colorDead = '#de2d26';
 colorAcci = 'rgb(255, 204, 0)';
 lngDim = null;
@@ -30,18 +86,19 @@ padding = 5;
 mapOffset = 4000;
 weekDayTable = ['Sun.', 'Mon.', 'Tue.', 'Wed.', 'Thu.', 'Fri.', 'Sat.'];
 gPrints = null;
-monthDim = null;
+doaDim = null;
 weekdayDim = null;
 hourDim = null;
 map = null;
 barAcciHour = null;
 var overlayed = false ;
 var pastzoom ; 
+var layer, svg;
 var zoom_changed = false ;			     //0.4
 var radiusTable = [0.1, 0.2, 0.3,0.34,0.38,1, 0.41,0.5,0.55,0.74,0.95, 1.5,2.1,2.8,3.1,3.66,3.85,4.0,4.43,5.9,6.99];
 var rad ; 
 var radzoom = 0;
-var startzoom = 12;
+var startzoom = 11;
 var outofbounds;
 var safetyW;
 var safetyH;
@@ -59,8 +116,33 @@ var safetyH;
   // scope.t_value = null; 
   var rectangle;
   var rectangle2;
+  var bounds2 ;
+  var inner1;
+  var inner2;
+  var rectcount = 0 ;
+  var y1 = [1.96, 2.06, 2.03, 2.11, 1.88, 1.88, 2.08, 1.93, 2.03, 2.03, 2.03, 2.08, 2.03, 2.11, 1.93];
+  var y2 = [2.96, 1.06, 6.03, 4.11, 4.88, 4.88, 2.08, 3.93, 0.03, 5.03, 1.03, 1.08, 0.03, 6.11, 4.93];
+      var burn_timeout_id;
+    var sample_timeout_id;
+    var plot_timeout_id;
+      var ttestcon;
+var ttest_dash;
+var dash_h ;
+var dash_w ;
+
+var svg2 ;
+var analysisbutton ;
+var text ;
+var clicktext1;
+var clicktext2;
+var downy = 30; 
+var updateview1;
+var updateview2;
 
 
+var addtopro = function(){
+  scope.loadcount = scope.loadcount + 1 ;
+}
 
         var styledMap = new  google.maps.StyledMapType([
     {
@@ -192,7 +274,9 @@ initMap = function(){
 
   });
 
-  var bounds2 = new google.maps.LatLngBounds(
+
+
+  bounds2 = new google.maps.LatLngBounds(
     new google.maps.LatLng(25.748781939750618, -80.21240599060059),
     new google.maps.LatLng(25.77087930591169, -80.18184391784666)
       
@@ -205,15 +289,13 @@ initMap = function(){
     editable: true
   });
 
-  rectangle.setMap(map);
+
 
     rectangle2 = new google.maps.Rectangle({
     bounds: bounds2,
     draggable: true,
     editable: true
   });
-
-  rectangle2.setMap(map);
 
     // Add an event listener on the rectangle.
   google.maps.event.addListener(rectangle2, 'bounds_changed', showNewRect2);
@@ -256,31 +338,24 @@ function showNewRect(event) {
   var sw = rectangle.getBounds().getSouthWest();
   lngDim.filterRange([sw.lng(), ne.lng()]);
   latDim.filterRange([sw.lat(), ne.lat()]);
-  var inner1 = monthDim.top(Infinity);
-
+  inner1 = doaDim.top(Infinity);
+  y1 = [];
   rect1_mean = d3.mean(inner1, function(ob){
-    return ob.drunk_dr;
+    y1[y1.length] = ob.lag_seconds;
+    return ob.lag_seconds;
   })
 
- rect1_var = d3.variance(inner1, function(ob){
-    return ob.drunk_dr;
-  })
+ rect1_var = d3.variance(y1);
 
 
-rect1_n = inner1.length;
+rect1_n = inner1.length
+if (rect1_n > 0 ){
+scope.$apply(updateview1);
+}
+// console.log('HELLPO')
+//   console.log(projection.fromLatLngToDivPixel(ne))
+//   console.log(projection.fromLatLngToDivPixel(sw))
 
-
-
-
-  var contentString = '<b>Stat Tester</b><br>' +
-      'Inner mean: ' + rect1_mean + '<br>' +
-      'Deviation: ' + Math.sqrt(rect1_var) + '<br>' +
-      'Sample Size: ' + rect1_n;
-
-
-  // Set the info window's content and position.
-  infoWindow.setContent(contentString);
-  infoWindow.setPosition(ne);
 
 //Returning bounds
     var bounds, northEast, southWest;
@@ -290,7 +365,7 @@ rect1_n = inner1.length;
     lngDim.filterRange([southWest.lng(), northEast.lng()]);
     latDim.filterRange([southWest.lat(), northEast.lat()]);
 ttest();
-  infoWindow.open(map);
+  // infoWindow.open(map);
  
 
 }
@@ -301,30 +376,18 @@ function showNewRect2(event) {
   var sw = rectangle2.getBounds().getSouthWest();
   lngDim.filterRange([sw.lng(), ne.lng()]);
   latDim.filterRange([sw.lat(), ne.lat()]);
-  var inner2 = monthDim.top(Infinity);
-
+  inner2 = doaDim.top(Infinity);
+  y2 = [];
   rect2_mean = d3.mean(inner2, function(ob){
-    return ob.drunk_dr;
+    y2[y2.length] = ob.lag_seconds;
+    return ob.lag_seconds;
   })
 
- rect2_var = d3.variance(inner2, function(ob){
-    return ob.drunk_dr;
-  })
+ rect2_var = d3.variance(y2);
 
 
 rect2_n = inner2.length;
 
-
-  var contentString = '<b>Stat Tester</b><br>' +
-      'Inner mean: ' + rect2_mean + '<br>' +
-      'Deviation: ' + Math.sqrt(rect2_var) + '<br>' +
-      'Sample Size: ' + rect2_n;
-
-
-
-  // Set the info window's content and position.
-  infoWindow2.setContent(contentString);
-  infoWindow2.setPosition(ne);
 
 //Returning bounds
     var bounds, northEast, southWest;
@@ -333,8 +396,9 @@ rect2_n = inner2.length;
     southWest = bounds.getSouthWest();
     lngDim.filterRange([southWest.lng(), northEast.lng()]);
     latDim.filterRange([southWest.lat(), northEast.lat()]);
-
-  infoWindow2.open(map);
+  if (rect2_n > 0 ){
+scope.$apply(updateview2);
+}
   ttest();
 }
 pastzoom  = map.getZoom();
@@ -352,6 +416,7 @@ zoom_changed = true ;
   });
 
   google.maps.event.addListener(map, 'bounds_changed', function(){
+
     var bounds, northEast, southWest;
     bounds = this.getBounds();
     radzoom = this.getZoom();
@@ -361,6 +426,8 @@ zoom_changed = true ;
     latDim.filterRange([southWest.lat(), northEast.lat()]);
     searchBox.setBounds(bounds); // For search bias
 
+
+ // rectangle2.setOptions({fillColor:rect_color(t_value) })
 
     return dc.redrawAll();
   });
@@ -374,8 +441,9 @@ zoom_changed = true ;
     southWest = bounds.getSouthWest();
 
 
+
     if (outofbounds( northEast, southWest)){
-    	console.log('out');
+    
     	overlay.draw();
 
 
@@ -386,22 +454,133 @@ zoom_changed = true ;
 
   map.mapTypes.set('map_style', styledMap);
   map.setMapTypeId('map_style');
+  $('#diff_plots_div').css('z-index', -10);
+  $('#group_diff_plot').css('z-index', -10);
+  $('#group_diff_hist').css('z-index', -10);
   return overlay.setMap(map);
 
 };
 
+
+
+
+
+var runbayes = function(){
+
+
+        var n_samples = 40000;
+        var n_burnin = 40000;
+        var posterior = make_BEST_posterior_func(y1, y2)
+                var data_calc = function(params) {
+            var mu_diff = params[0] - params[1]
+            var sd_diff = params[2] - params[3]
+            var effect_size = (params[0] - params[1]) / Math.sqrt((Math.pow(params[2], 2) + Math.pow(params[3], 2)) / 2 )
+            var normality = Math.log(params[4]) / Math.LN10
+            return [mu_diff, sd_diff, normality, effect_size]
+        }
+
+
+         var inits = [jStat.mean(y1), jStat.mean(y2), jStat.stdev(y1), jStat.stdev(y2), 5]
+
+        var sampler = new amwg(inits, posterior, data_calc)
+        var count = 0.0;
+        function burn_asynch(n) {
+        scope.$apply(function (){
+          scope.percentDone = "Percent Done\n" + (count /(n_burnin/500.0 ) *100).toFixed(0) + "%"
+        })
+            sampler.burn(500)
+            count = count + 1;
+            if(n > 0) {
+
+                burn_timeout_id = setTimeout(function() {burn_asynch(n - 1)}, 0)
+            } else {
+                console.log("\n-- Finished Burn in phase --\n")
+                console.log("\n-- Started sampling phase --\n")
+                  $('#group_diff_plot').css('z-index', 2);
+                 $('#group_diff_hist').css('z-index', 2);
+                 $("#diff_plots_div").css('z-index', 2);
+                $("#diff_plots_div").show();
+                sample_timeout_id = sampler.n_samples_asynch(n_samples, 50)
+                plot_asynch()
+            }
+        }
+
+   function plot_asynch() {
+            var plot_start_time = new Date()
+            var chain = sampler.get_chain()
+            var plot_data = chain_to_plot_data(chain, Math.ceil(n_samples / 1000))
+
+            plot_mcmc_chain("group_diff_plot", plot_data[5], "samples")
+            //plot_mcmc_chain("plot3", plot_data[2] , "title2")
+            //plot_mcmc_chain("plot5", plot_data[4], "title3")
+
+            plot_mcmc_hist("group_diff_hist", param_chain(chain, 5), true, 0)
+            //plot_mcmc_hist("plot4", param_chain(sampler.get_chain(), 2), true)
+            //plot_mcmc_hist("plot6", param_chain(sampler.get_chain(), 4), true)
+            
+            var plot_time = (new Date()) - plot_start_time
+            if(sampler.is_running_asynch()) {
+                plot_timeout_id = setTimeout(function() {plot_asynch()}, plot_time * 2 )
+            } else {
+   
+                //c// $("#more_results_wrapper_div").show();
+                //c// log_t_test()
+               
+
+            }
+        }
+
+        burn_asynch(Math.ceil(n_burnin /  500));
+
+}
+
+
+
 var ttest = function (){
   scope.$apply(function(){
-  scope.t_value = (rect1_mean - rect2_mean)/ (Math.sqrt( ((rect1_var/rect1_n) + (rect2_var/rect2_n)) )) ;
+  var p = jStat.ttest((rect1_mean - rect2_mean)/ (Math.sqrt( ((rect1_var/rect1_n) + (rect2_var/rect2_n)) )) , rect1_n + rect2_n, 2 );
+  if( !isNaN(p) && !(p === undefined) ){
+ rectangle.setOptions({fillColor:rect_color(p) })
+ rectangle2.setOptions({fillColor:rect_color(p) })
+  scope.p_val =  'Two-Tailed P-value: ' + p.toFixed(5)
+}
+
 });
 }
 
-var rect_color = d3.scale.linear().domain([-3,3]).range(['red','black', 'black','red'])
-scope.$watch('t_value', function (t_value){
 
-if ( ! (scope.t_value === undefined)){
- rectangle.setOptions({fillColor:rect_color(t_value) })
- rectangle2.setOptions({fillColor:rect_color(t_value) })
+
+
+var rect_color = d3.scale.linear().domain([0,1]).range(['red','black','black'])
+scope.$watch('p_val', function (p_val){
+
+if ( ! (p_val === undefined) ){
+ 
+
+
+
+
+if (rectcount ==  0){
+svg2 = ttestcon.append('svg').attr('height', dash_h).attr('width', dash_w)
+analysisbutton = svg2.append('rect')
+          .attr({x:10, y:270 + downy, width: dash_w-(2*10), height: 40, fill: '#3182bd'}).on('mouseenter',function(){
+            analysisbutton.attr({ opacity: 0.5})
+          }).on('mouseleave',function(){
+            analysisbutton.attr({ opacity: .8})
+          }).on('click', function(){
+            runbayes();
+          });
+
+text = svg2.append('text').text('Run Bayesian Analysis')
+                .attr('x', 27 )
+                .attr('y', 295  + downy )
+                .attr( 'text-align', 'center')
+                .attr('class', 'muted')
+                
+                rectcount= 1;
+
+    }
+      
 }
  
 
@@ -410,17 +589,33 @@ if ( ! (scope.t_value === undefined)){
 
 
 
+var removerect1 = function (){
+  rectangle.setMap(null);
+}
+
+var addrect1 = function (){
+  rectangle.setMap(map);
+}
 
 
 
+var removerect2 = function (){
+  rectangle2.setMap(null);
+}
 
+var addrect2 = function (){
+  rectangle2.setMap(map);
+}
+
+ var lagedscale =  d3.scale.linear().domain([0, 350000]).range(['rgb(189,0,38)','rgb(128,0,38)']);
+ var radadd =  d3.scale.pow().domain([0, 350000]).range([1.2,1.35]);
 transform = function(d){
   d = new google.maps.LatLng(d.GoogleLat, d.GoogleLng);
   d = projection.fromLatLngToDivPixel(d);
   return d3.select(this).style('left', (d.x - padding) + 'px').style('top', (d.y - padding) + 'px');
 };
 ifdead = function(it, iftrue, iffalse){
-  if (it.dead > 0) {
+  if (2 > 0) {
     return iftrue;
   } else {
     return iffalse;
@@ -438,16 +633,18 @@ setCircle = function(it){
       return it.coory;
     },
     'r': function(it){
+      
+      return String(rad * radadd(it.lag_seconds*60) + 'px')
 
-      return ifdead(it, rad + 'px', rad + 'px');
     }
   }).style({
     'fill': function(it){
-      return ifdead(it, '#de2d26', 'yellow');
+
+      return lagedscale((it.lag_seconds)*60);
     },
     'position': 'absolute',
     'opacity': function(it){
-      return ifdead(it, .9, .9);
+      return ifdead(it, .8, .8);
     }
   });
 };
@@ -466,22 +663,30 @@ tranCircle = function(it){
 
 updateGraph = function(){
   var dt;
-  dt = gPrints.selectAll('circle').data(monthDim.top(Infinity));
+  lngDim.filterRange([overlaysouthWest.lng()-safetyW*1 , overlaynorthEast.lng()+safetyW*1 ]);
+  latDim.filterRange([overlaysouthWest.lat()-safetyH*1, overlaynorthEast.lat()+safetyH*1]);
+
+  dt = gPrints.selectAll('circle').data(doaDim.top(Infinity));
   dt.enter().append('circle').call(setCircle);
-  dt.call(setCircle);
-  return dt.exit().remove();
+  // dt.call(setCircle);
+    var bounds = map.getBounds();
+    var northEast = bounds.getNorthEast();
+    var southWest = bounds.getSouthWest();
+
+    lngDim.filterRange([southWest.lng(), northEast.lng()]);
+    latDim.filterRange([southWest.lat(), northEast.lat()]);
+  dt.exit().remove();
+
 };
 
-d3.csv('./vis1u.csv', function(err, tsvBody){
-  var deadData, barPerMonth, barPerWeekDay, barPerHour, barAcciMonth, barAcciWeekDay, ndx, all, acciMonth, acciWeekDay, acciHour, deathMonth, deathWeekDay, deathHour, barMt, barWk, barHr, marginMt, marginWk, marginHr, navls, navidx, nav;
+d3.csv('./vis3data.csv', function(err, tsvBody){
+  var deadData, barPerdoa, barPerWeekDay, barPerHour, barAccidoa, barAcciWeekDay, ndx, all, accidoa, acciWeekDay, acciHour, deathdoa, deathWeekDay, deathHour, barMt, barWk, barHr, marginMt, marginWk, marginHr, navls, navidx, nav;
   // deadData = [];
   tsvBody.filter(function(d){
 
     d.GoogleLng = +d.GoogleLng;
     d.GoogleLat = +d.GoogleLat;
-    d.date = new Date(d['year'], d['month'], d['day'], d['hour'], d['minute']);
-    d.week = weekDayTable[d.date.getDay()];
-    d.dead = +d['drunk_dr'];
+    d.lag_seconds = Number(d.lag_seconds);
 
     // if (d.dead > 0) {
     //   deadData.push(d);
@@ -527,7 +732,7 @@ outofbounds = function ( northEast, southWest){
 var randomCrash = function (){
 
 if (data20000.length == 0 ){
-data20000 = _.sample(monthDim.top(Infinity),1000);
+data20000 = _.sample(doaDim.top(Infinity),1000);
 return data20000;
 } else {
 return data20000;
@@ -547,8 +752,8 @@ d3.select("circle")
   };
 
   overlay.onAdd = function(){
-  	console.log("count")
-    var layer, svg;
+scope.$apply(addtopro());
+  	
     layer = d3.select(this.getPanes().overlayLayer).append('div').attr('class', 'stationOverlay');
     svg = layer.append('svg');
     gPrints = svg.append('g').attr({
@@ -566,6 +771,7 @@ d3.select("circle")
   
 
     return overlay.draw = function(){
+      scope.$apply(addtopro());
     	// making internal data so overlay doesn't redraw everything
     	var _data = null;
     	// filtering out bounds 
@@ -581,12 +787,12 @@ d3.select("circle")
 
     lngDim.filterRange([overlaysouthWest.lng()-safetyW*2 , overlaynorthEast.lng()+safetyW*2 ]);
     latDim.filterRange([overlaysouthWest.lat()-safetyH*3, overlaynorthEast.lat()+safetyH*3]);
-    console.log('here');
+ 
  //    	if(data20000.length == 0 ){
  //    	lngDim.filterAll();
 	// 	latDim.filterAll();
 	// }
-		_data = monthDim.top(Infinity);//randomCrash();
+		_data = doaDim.top(Infinity);//randomCrash();
 
       var googleMapProjection, dt;
       projection = this.getProjection();
@@ -622,42 +828,40 @@ d3.select("circle")
     
 
   };
-  barPerMonth = dc.barChart('#DeathMonth');
-  barPerWeekDay = dc.barChart('#DeathWeekDay');
-  barPerHour = dc.barChart('#DeathHour');
-  barAcciMonth = dc.barChart('#AcciMonth');
-  barAcciWeekDay = dc.barChart('#AcciWeekDay');
-  barAcciHour = dc.barChart('#AcciHour');
+  // barPerdoa = dc.barChart('#Deathdoa');
+  // barPerWeekDay = dc.barChart('#DeathWeekDay');
+  // barPerHour = dc.barChart('#DeathHour');
+  barAccidoa = dc.rowChart('#Accidoa');
+
   ndx = crossfilter(tsvBody);
 
   all = ndx.groupAll();
-  monthDim = ndx.dimension(function(it){
-    return Number( it['month']);
+var doadeck = {0:"At Hospital", 7:"Died at Scene", 8:"Died En Route", 9:"Unknown" }
+  doaDim = ndx.dimension(function(it){
+
+ return doadeck[ Number( it['doa']) ]
+    
   });
-  weekdayDim = ndx.dimension(function(it){
-    return it.week;
-  });
-  hourDim = ndx.dimension(function(it){
-    return Number( it['hour'] ) ;
-  });
+  scope.$apply(addtopro());
   lngDim = ndx.dimension(function(it){
     return it.GoogleLng;
   });
+  scope.$apply(addtopro());
   latDim = ndx.dimension(function(it){
     return it.GoogleLat;
   });
-  acciMonth = monthDim.group().reduceCount();
-  acciWeekDay = weekdayDim.group().reduceCount();
-  acciHour = hourDim.group().reduceCount();
-  deathMonth = monthDim.group().reduceSum(function(it){
-    return it.dead;
-  });
-  deathWeekDay = weekdayDim.group().reduceSum(function(it){
-    return it.dead;
-  });
-  deathHour = hourDim.group().reduceSum(function(it){
-    return it.dead;
-  });
+   scope.$apply(addtopro());
+  accidoa = doaDim.group().reduceCount();
+
+  // deathdoa = doaDim.group().reduceSum(function(it){
+  //   return it.dead;
+  // });
+  // deathWeekDay = weekdayDim.group().reduceSum(function(it){
+  //   return it.dead;
+  // });
+  // deathHour = hourDim.group().reduceSum(function(it){
+  //   return it.dead;
+  // });
   barMt = 350;
   barWk = 270;
   barHr = 550;
@@ -669,141 +873,127 @@ d3.select("circle")
   };
   marginWk = marginMt;
   marginHr = marginMt;
-  barPerMonth.width(barMt).height(100).margins(marginMt).dimension(monthDim).group(deathMonth).x(d3.scale.ordinal().domain(d3.range(1, 13))).xUnits(dc.units.ordinal).elasticY(true).on('filtered', function(c, f){
 
-    if ( !checkoverlay(map.getZoom())) {
-    return updateGraph();
-	}
-  }).yAxis().ticks(3);
-  barPerWeekDay.width(barWk).height(100).margins(marginWk).dimension(weekdayDim).group(deathWeekDay).x(d3.scale.ordinal().domain(weekDayTable)).xUnits(dc.units.ordinal).gap(4).elasticY(true).on('filtered', function(c, f){
+  dash_h = 655;
+  dash_w = 200;
+  ttestcon = d3.select('#ttest').append('svg')
+  .attr('width', dash_w)
+  .attr('height', dash_h);
 
-    if ( !checkoverlay(map.getZoom())) {
-    return updateGraph();
-	}
-  }).yAxis().ticks(3);
-  barPerHour.width(barHr).height(100).margins(marginHr).dimension(hourDim).group(deathHour).x(d3.scale.linear().domain([0, 24])).elasticY(true).on('filtered', function(c, f){
 
-    if ( !checkoverlay(map.getZoom())) {
+          var dash_back = ttestcon.append('rect')
+              .attr({x:0, y:0, width: dash_w, height: dash_h , fill: 'gray', opacity: 0.5});
 
-    return updateGraph();
-	}
-  }).yAxis().ticks(3);
-  barAcciMonth.width(barMt).height(100).margins(marginMt).dimension(monthDim).group(acciMonth).x(d3.scale.ordinal().domain(d3.range(1, 13))).xUnits(dc.units.ordinal).elasticY(true).on('filtered', function(c, f){
-	
-    if ( !checkoverlay(map.getZoom())) {
-    return updateGraph();
-	}
-  }).yAxis().ticks(4);
-  barAcciWeekDay.width(barWk).height(100).margins(marginWk).dimension(weekdayDim).group(acciWeekDay).x(d3.scale.ordinal().domain(weekDayTable)).xUnits(dc.units.ordinal).elasticY(true).gap(4).on('filtered', function(c, f){
+var startsvg = ttestcon.append('svg').attr('height', dash_h).attr('width', dash_w)
 
+updateview1 = function(){
+
+scope.box1 = " Rectange 1\nMean: " + rect1_mean.toFixed(3) + "\n SD:\n " + Math.sqrt(rect1_var).toFixed(3)
++ "\n" + " Sample\n n = " + rect1_n
+
+
+}
+
+   updateview2 = function(){
+
+
+scope.box2 = " Rectange 2\nMean: " + rect2_mean.toFixed(3) + "\n SD:\n " + Math.sqrt(rect2_var).toFixed(3)
++ "\n" + " Sample\n n = " + rect2_n
+
+
+
+} 
+
+
+clicktext1 = startsvg.append('text').text('Add')
+                .attr('x', 40 )
+                .attr('y', 60 + downy )
+                .attr( 'text-align', 'center')
+                .attr('class', 'muted')
+clicktext2 = startsvg.append('text').text('Add')
+                .attr('x', 135 )
+                .attr('y', 60  + downy)
+                .attr( 'text-align', 'center')
+                .attr('class', 'muted')
+
+      var enterrect1 = startsvg.append('rect')
+          .attr({x:10, y: 10 + downy, width: 85, height: 85, fill: '#3182bd'}).on('click',function(){
+      
+          
+          bounds2 = new google.maps.LatLngBounds(
+            (overlay.getProjection().fromContainerPixelToLatLng(new google.maps.Point(684,412.9999999998836)) ),
+            (overlay.getProjection().fromContainerPixelToLatLng(new google.maps.Point(747,345.9999999999418)) )
+          ); 
+          rectangle.setOptions({bounds:bounds2 })
+
+          if (clicktext1.attr("x") != 27 ){
+             addrect1();
+          clicktext1.text('Remove').attr('x', 27 );
+        } else {
+            removerect1();
+            clicktext1.text('Add').attr('x', 40);
+        }
+
+          }).attr({ opacity: 0.5});
+
+
+            var enterrect2 = startsvg
+      .append('rect')
+      // dash_h - 90 - 5
+          .attr({x:105, y: 10 + downy, width: 85, height: 85, fill: '#3182bd'}).on('click',function(){
+
+     
+          bounds2 = new google.maps.LatLngBounds(
+            (overlay.getProjection().fromContainerPixelToLatLng(new google.maps.Point(684,412.9999999998836)) ),
+            (overlay.getProjection().fromContainerPixelToLatLng(new google.maps.Point(747,345.9999999999418)) )
+          ); 
+          rectangle2.setOptions({bounds:bounds2 })
+          if (clicktext1.attr("x") != 123 ){
+             addrect2();
+          clicktext2.text('Remove').attr('x', 123 );
+        } else {
+          clicktext2.text('Add').attr('x', 135);
+            removerect2();
+            
+        }
+          }).attr({ opacity: 0.5});
+
+
+
+
+             
+
+
+  barAccidoa.width(180)
+        .height(220)
+        .margins(marginMt)
+        .group(accidoa)
+        .dimension(doaDim)
+                // .ordinalColors(['#3182bd', '#6baed6', '#9ecae1', '#c6dbef', '#dadaeb'])
+        .label(function (d) {
+          return d.key;
+        })
+        .title(function (d) {
+            
+            return d.value;
+        })
+      
+        .elasticX(true).on('filtered', function(c, f){
     if ( !checkoverlay(map.getZoom())) {
     return updateGraph();
-	}
-  }).yAxis().ticks(4);
-  barAcciHour.width(barHr).height(100).margins(marginHr).dimension(hourDim).group(acciHour).x(d3.scale.linear().domain([0, 24])).elasticY(true).on('filtered', function(c, f){
-  	  
-    if ( !checkoverlay(map.getZoom())) {
-    return updateGraph();
-	}
-  }).yAxis().ticks(4);
+  }
+  })
+
+        .xAxis().ticks(4);
+
+
+
+
+
   dc.renderAll();
+  scope.$apply(addtopro());
   initMap();
-  navls = [
-    {
-      'ttl': 'Accident Crossfilter',
-      'txt': 'Accidents from the Xinzhu area in Taiwan are visualized in the period January to October 2013 – a total of 13,200 accidents and 25+ deaths. Orange represents accidents, and red are accidents where death occurred. </br></br>(Click here to start navigation.)',
-      'act': function(){}
-    }, {
-      'ttl': 'Death by Month – 2013',
-      'txt': 'Here are the statistics by months: Orange represents accidents, and red accidents involved a death. Notice that there were no deaths in April, although the accident count is relatively high. (Click here for Day of the Week)',
-      'act': function(){
-        return d3.selectAll('.fltWeek, .fltHour').transition().style({
-          'opacity': 0.2
-        });
-      }
-    }, {
-      'ttl': 'Day of the Week',
-      'txt': 'Accidents on days of the week are relatively even; however, in our dataset, there were no accidents death on Monday. (Click here for Hour of the Day)',
-      'act': function(){
-        d3.selectAll('.fltMonth, .fltHour').transition().style({
-          'opacity': 0.2
-        });
-        return d3.selectAll('.fltWeek').transition().style({
-          'opacity': 1
-        });
-      }
-    }, {
-      'ttl': 'Hour of the Day',
-      'txt': 'Accidents decreased after 7 pm, and the lowest number occurred between 0 am to 7 am. When we look at accident deaths, however, 0 am to 7 am is very deadly. To prevent accident deaths, this time period is a good place to start.</br></br>This is interesting, but where exactly are these accidents? (Click here to find out)',
-      'act': function(){
-        d3.selectAll('.fltMonth, .fltWeek').transition().style({
-          'opacity': 0.2
-        });
-        return d3.selectAll('.fltHour').transition().style({
-          'opacity': 1
-        });
-      }
-    }, {
-      'ttl': 'Analysis with a Click',
-      'txt': 'If you drag your mouse from 0 am to 7 am, all the accidents are highlighted on the map (1 sec response time). Notice that the week and month charts are updated according to your action. (Click here for Crossfilter)',
-      'act': function(){
-        d3.selectAll('.filter').transition().style({
-          'opacity': 1
-        });
-        return hourDim.filter([0, 8]);
-      }
-    }, {
-      'ttl': 'Crossfilter',
-      'txt': 'You can also select multiple criteria, such as the accidents that happened from 0 am to 7 am on weekends. For these criteria, drag your mouse for the timeframe and then click on Saturday and Sunday. (Click here for Geo-Crossfilter)',
-      'act': function(){
-        return weekdayDim.filter(['Sat', 'Sun']);
-      }
-    }, {
-      'ttl': 'Geo-Crossfilter',
-      'txt': 'This also work the other way, we can zoom-in into any part of the map, and the charts will update accordingly. Now we are viewing the area around the train station. (Click here for another Geo-Crossfilter)',
-      'act': function(){
-        map.setZoom(13);
-        return setTimeout(function(){
-          map.setZoom(14);
-          return setTimeout(function(){
-            map.setZoom(15);
-            return setTimeout(function(){
-              return map.setZoom(16);
-            }, 100);
-          }, 100);
-        }, 100);
-      }
-    }, {
-      'ttl': 'Geo-Crossfilter',
-      'txt': 'Now we’re around Chiao Tung University.</br></br>The benefit of programming-generated visualization is that once developed, we just feed in different data to generate an up-to-date graph.</br></br>Start exploring on your own! Zoom in and out use the sliding scale on the left. You can use the directional arrows to move around the map or just drag the map itself from one part of the city to another.',
-      'act': function(){
-        return map.panTo({
-          lat: 24.799232620011438,
-          lng: 120.98143010818478
-        });
-      }
-    }
-  ];
-  navidx = 0;
-  (nav = function(){
-    var ctn, l;
-    ctn = navls[navidx];
-    l = navls.length - 1;
-    if (navidx > l) {
-      return d3.selectAll('.ctn-nav').transition().style({
-        'opacity': 0
-      });
-    } else {
-      d3.selectAll('.navttl').text(ctn.ttl);
-      d3.selectAll('.navidx').text(navidx + '/' + l);
-      d3.selectAll('.navtxt').html(ctn.txt);
-      return ctn.act();
-    }
-  })();
-  return d3.selectAll('.ctn-nav').on('mousedown', function(){
-    ++navidx;
-    return nav();
-  });
+
 });
 
 google.maps.event.addDomListener(window, 'load', initMap);

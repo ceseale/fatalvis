@@ -8,8 +8,8 @@
     <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
     <!-- build:css(.) styles/vendor.css -->
     <!-- bower:css -->
-    <link rel="stylesheet" href="scripts/bootstrap/dist/css/bootstrap.css" />
-    <link rel="stylesheet" href="scripts/dcjs/dc.css" />
+    <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css" />
+    <link rel="stylesheet" href="bower_components/dcjs/dc.css" />
     <!-- endbower -->
     <!-- endbuild -->
     <!-- build:css(.tmp) styles/main.css -->
@@ -34,16 +34,17 @@
               <span class="icon-bar"></span>
             </button>
 
-            <a class="navbar-brand muted" href="#/">TODO</a>
+            <a class="navbar-brand muted" href="#/">Fatal Visualizations</a>
           </div>
 
           <div class="collapse navbar-collapse" id="js-navbar-collapse">
 
             <ul class="nav navbar-nav">
-              <li class="active"><a href="#/National_Density_Analysis">National Density Analysis</a></li>
-              <li><a ng-href="#/Local_Comparisons">Local Comparisons</a></li>
-              <li><a ng-href="#/Time_Series">Local Time Series</a></li>
-              <li><a ng-href="#/Predicting_Emergency_Response">Predicting Emergency Response</a></li>
+
+              <li class="active"><a href="#/Time_Series">National Time Series</a></li>
+
+              <li><a ng-href="#/Local_Density_Analysis">Local Lag Analysis</a></li>
+              <li><a ng-href="#/bayes_clusters">Baysiean Cluster Analysis</a></li>
             </ul>
           </div>
         </div>
@@ -69,28 +70,32 @@
 
     <!-- build:js(.) scripts/vendor.js -->
     <!-- bower:js -->
-    <script src="scripts/jquery/dist/jquery.js"></script>
-    <script src="scripts/angular/angular.js"></script>
-    <script src="scripts/bootstrap/dist/js/bootstrap.js"></script>
-    <script src="scripts/angular-animate/angular-animate.js"></script>
-    <script src="scripts/angular-cookies/angular-cookies.js"></script>
-    <script src="scripts/angular-resource/angular-resource.js"></script>
-    <script src="scripts/angular-route/angular-route.js"></script>
-    <script src="scripts/angular-sanitize/angular-sanitize.js"></script>
-    <script src="scripts/angular-touch/angular-touch.js"></script>
-    <script src="scripts/d3/d3.js"></script>
-    <script src="scripts/crossfilter/crossfilter.js"></script>
-    <script src="scripts/dcjs/dc.js"></script>
-    <script src="scripts/underscore/underscore.js"></script>
+    <script src="bower_components/jquery/dist/jquery.js"></script>
+    <script src="bower_components/angular/angular.js"></script>
+    <script src="bower_components/bootstrap/dist/js/bootstrap.js"></script>
+    <script src="bower_components/angular-animate/angular-animate.js"></script>
+    <script src="bower_components/angular-cookies/angular-cookies.js"></script>
+    <script src="bower_components/angular-resource/angular-resource.js"></script>
+    <script src="bower_components/angular-route/angular-route.js"></script>
+    <script src="bower_components/angular-sanitize/angular-sanitize.js"></script>
+    <script src="bower_components/angular-touch/angular-touch.js"></script>
+    <script src="bower_components/d3/d3.js"></script>
+    <script src="bower_components/crossfilter/crossfilter.js"></script>
+    <script src="bower_components/dcjs/dc.js"></script>
+    <script src="bower_components/underscore/underscore.js"></script>
     <!-- endbower -->
     <!-- endbuild -->
         <!-- build:js({.tmp,app}) scripts/scripts.js -->
+ <script src="http://d3js.org/queue.v1.min.js"></script>
         <script src="scripts/d3.tip.v0.6.3.js"></script> 
         <script src="https://maps.google.com/maps/api/js?libraries=places&sensor=false"></script>
         <script src="scripts/app.js"></script>
         <script src="scripts/controllers/main.js"></script>
-        <script src="scripts/controllers/choropleth.js"></script>
+        <script src="scripts/controllers/cluster.js"></script>
         <script src="scripts/controllers/timemap.js"></script>
+        <script src="scripts/jstat.js"></script>
+        <script src="scripts/js_mcmc.js"></script>
+        <script src="scripts/jquery.flot.min.js"></script>
         <!-- endbuild -->
 </body>
 </html>

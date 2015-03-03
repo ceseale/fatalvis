@@ -5,6 +5,7 @@ svg text {
 }
 
 #map {
+   z-index: 0;
     display: block;
     position:absolute;
     height:auto;
@@ -17,16 +18,33 @@ svg text {
 .ctn-filter{
   position: absolute;
   bottom: 0;
-    margin-left: 0px;
+  left: 0px;
+    /*margin-left: 0px;*/
 }
-#DeathMonth,
-#AcciMonth {
-  width: 330px;
+
+#Accidoa {
+  z-index: 6;
+left: 18px;
+bottom: 51px;
+position: absolute;
+width: 0px;
 }
+
+#AcciWeekDay{
+
+    z-index: 5;
+    left :0px;
+    bottom: 23px;  
+    position:absolute;
+    width: 0px;
+
+}
+
+
 .ctn-nav {
   box-shadow: "rgb(0, 0, 0) 0px 0px 17px 2px";
   position: fixed;
-  right: 80px;
+  right: 0px;
   top: 30px;
   z-index: 3;
   opacity: 0.9;
@@ -39,30 +57,148 @@ svg text {
 .navidx {
   text-align: center;
 }
+#AcciHour{
+    z-index: 5;
+    left :535px;
+    bottom: 23px;  
+    position:absolute;
+    width: 0px;
+
+}
+
+#ttest{
+    z-index: 5;
+    left :16px;
+    bottom: 23px;  
+    position:absolute;
+    width: 0px;
+
+}
+input,
+#pac-input{
+
+  z-index: 0;
+  left: 2px;
+  top:25px;
+  width: 211px;
+  opacity: 0.6;
+
+}
 
 
+#group_diff_plot{
+bottom: 24px !important;
+z-index: 0;
+right: 507px;
+/*top: 593px;*/
+width: 454px;
+opacity: .9;
+height: 0px;
+position: fixed;
+opacity: .9;
+
+}
+
+#box1{
+  z-index: 6;
+left :26px;
+top: 259px;  
+position:absolute;
+width: 85px;
+height: 85px;
+color: white;
+font-family: sans-serif;
+text-align: center;
+}
+#box2{
+  z-index: 6;
+left :122px;
+top: 259px;  
+position:absolute;
+width: 85px;
+height: 85px;
+color: white;
+font-family: sans-serif;
+text-align: center;
+}
+#pvalue {
+z-index: 6;
+left :15px;
+top: 405px;  
+position:absolute;
+width: 200px;
+height: 19px;
+color: white;
+font-family: sans-serif;
+text-align: center;
+}
+#bayesload{
+  z-index: 6;
+left :26px;
+top: 507px;  
+position:absolute;
+width: 85px;
+height: 85px;
+color: white;
+font-family: sans-serif;
+text-align: center;
+}
+
+ .tickLabel{
+color: white;
+}
+#group_diff_hist{
+bottom: 23px !important;
+z-index: 0;
+right: 38px;
+fill: white;
+/* top: 593px; */
+width: 454px;
+opacity: .9;
+height: 0px;
+position: fixed;
+color: white;
+}
+
+.legendLabel {
+  font-size:11px; line-height:0px; 
+}
+.item_title, .item_description { 
+    font-size:14px; line-height:125%; text-align: center;
+}
     </style>
 
 
-
+<loading-donut></loading-donut>
  <google-vis></google-vis>
-  <input id="pac-input" class="controls" type="text" placeholder="Search Box">
+  <input id="pac-input" type="text" placeholder="Search Box">
  <div id="map"></div>
- <div class="ctn-filter-all">
-  <div class="ctn-filter">
-    <div id="DeathMonth" class="filter fltMonth col-lg-3">Death/Month</div>
-    <div id="DeathWeekDay" class="filter fltWeek col-lg-3">Death/Weekday</div>
-    <div id="DeathHour" class="filter fltHour col-lg-3">Death/Hour</div>
-  </div>
 
-    <div class="ctn-filter">
-      <div id="AcciMonth" class="filter fltMonth col-lg-3">Accidents/Month</div>
-      <div id="AcciWeekDay" class="filter fltWeek col-lg-3">Accidents/Weekday</div>
-      <div id="AcciHour" class="filter fltHour col-lg-3">Accidents/Hour</div>
-    </div>
-  </div>
-    <div class="ctn-nav">
-    <h3 class="navttl">Accidents Crossfilter</h3>
+               <div id="diff_plots_div">
+                <div id="group_diff_plot_wrapper_div" class="sg-8">
+                     <div class="item_title">Trace Plot - Difference of Means</div>
+                    <div id="group_diff_plot" style="height: 200px; bottom:0px ; "></div> 
+                    <div class="item_description">Should look like a "hairy caterpillar"...</div>
+                </div>
+                <div id="group_diff_hist_wrapper_div" class="sg-11">
+                     <div class="item_title">Distribution - Difference of Means</div>
+                    <div id="group_diff_hist" style="height: 200px; bottom: 0px ;"></div>
+                    <div class="item_description">If the 95% Highest Density Interval does not include zero there is a credible difference!</div>
+                </div>
+            </div>
+           
+
+<div id="bayesload" >{{percentDone}}</div>
+ <div id="Accidoa"></div>
+     
+
+<div id="ttest"></div>
+<div id= "box1">{{box1}}</div>
+<div id= "box2">{{box2}}</div>
+<div id= "pvalue"> {{p_val}}</div>
+<!-- <input id = "samp" type="numbers" ng-model="sampled"> -->
+   <!--  <div class="ctn-nav"> -->
+<!-- 
     <h5 class="navidx"></h5>
-    <p class="navtxt"></p>
+    <p class="navtxt"></p> -->
     </div>

@@ -1,3 +1,6 @@
+/*google*/
+/*d3*/
+/*crossfilter*/
 'use strict';
 
 var app = angular.module('ibmappApp');
